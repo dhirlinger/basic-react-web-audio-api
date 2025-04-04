@@ -8,7 +8,7 @@ export default function App() {
   const gainRef = useRef(null);
   const nowRef = useRef(null);
   const oscStartedRef = useRef(false);
-  // const freqRef = useRef(440);
+  const [freq, setFreq] = useState(440);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(()=> {
@@ -20,13 +20,15 @@ export default function App() {
     gainRef.current.connect(audioContextRef.current.destination);
     gainRef.current.gain.value = 0.0;
     nowRef.current = audioContextRef.current.currentTime;
-    oscRef.current.frequency.value = 440; 
     
     return () => {
       audioContextRef.current.close(); 
     };
   }, []);
   
+  useEffect(() => {
+    oscRef.current.frequency.value = freq;
+  }, [freq]);
   
   const handleClick = () => {
     if(!oscStartedRef.current) { 
@@ -43,14 +45,23 @@ export default function App() {
     setIsPlaying(!isPlaying);
   }
 
+  const handleFreqChange = (event) => {
+    setFreq(event.target.value);
+  };
+
   return (
     <>
       <h1>Web Audio API + React</h1>
       <div className="card">
         <button onClick={handleClick}>
-          {`${isPlaying ? "stop"  :  "play" }`}
+          {`${isPlaying ? "Stop"  :  "Play" }`}
         </button>
+        <div>
+          <h2>Frequency: {freq}</h2>
+          <input max="880" min="110" type="range" value={freq} step="110" onChange={handleFreqChange}/>
+        </div>
       </div>
+      
       
     </>
   )
