@@ -8,7 +8,7 @@ export default function App() {
   const gainRef = useRef(null);
   const nowRef = useRef(null);
   const oscStartedRef = useRef(false);
-  const freqRef = useRef(440);
+  // const freqRef = useRef(440);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(()=> {
@@ -35,7 +35,7 @@ export default function App() {
     }
 
     if(!isPlaying) { 
-      gainRef.current.gain.setTargetAtTime(0.05, nowRef.current, 0.1);
+      gainRef.current.gain.setTargetAtTime(0.5, nowRef.current, 0.1);
     } else {
       gainRef.current.gain.setTargetAtTime(0.0, nowRef.current, 0.1);
     }
