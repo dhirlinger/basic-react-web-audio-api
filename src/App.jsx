@@ -10,6 +10,7 @@ export default function App() {
   const oscStartedRef = useRef(false);
   const [freq, setFreq] = useState(440);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [waveshape, setWaveshape] = useState("sine");
 
   useEffect(()=> {
     audioContextRef.current = new AudioContext();
@@ -29,6 +30,10 @@ export default function App() {
   useEffect(() => {
     oscRef.current.frequency.value = freq;
   }, [freq]);
+
+  useEffect(() => {
+    oscRef.current.type = waveshape; 
+  }, [waveshape]);
   
   const handleClick = () => {
     if(!oscStartedRef.current) { 
@@ -49,6 +54,10 @@ export default function App() {
     setFreq(event.target.value);
   };
 
+  const handleShapeChange = (event) => {
+    setWaveshape(event.target.value);
+  }
+
   return (
     <>
       <h1>Web Audio API + React</h1>
@@ -56,6 +65,16 @@ export default function App() {
         <button onClick={handleClick}>
           {`${isPlaying ? "Stop"  :  "Play" }`}
         </button>
+        <div>
+          <input type="radio" value="sine" name="waveshape" id="sine" checked={waveshape === "sine"} onChange={handleShapeChange}></input>
+          <label>sine</label>
+          <input type="radio" value="triangle" name="waveshape" id="triangle" checked={waveshape === "triangle"} onChange={handleShapeChange}></input>
+          <label>triangle</label>
+          <input type="radio" value="square" name="waveshape" id="square" checked={waveshape === "square"} onChange={handleShapeChange}></input>
+          <label>square</label>
+          <input type="radio" value="sawtooth" name="waveshape" id="sawtooth" checked={waveshape === "sawtooth"} onChange={handleShapeChange}></input>
+          <label>sawtooth</label>
+        </div>
         <div>
           <h2>Frequency: {freq}</h2>
           <input max="880" min="110" type="range" value={freq} step="110" onChange={handleFreqChange}/>
