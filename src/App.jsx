@@ -21,6 +21,7 @@ export default function App() {
     gainRef.current.connect(audioContextRef.current.destination);
     gainRef.current.gain.value = 0.0;
     nowRef.current = audioContextRef.current.currentTime;
+    oscRef.current.addEventListener("ended", () => {console.log('ended')});
     
     return () => {
       audioContextRef.current.close(); 
@@ -35,19 +36,29 @@ export default function App() {
     oscRef.current.type = waveshape; 
   }, [waveshape]);
   
-  const handleClick = () => {
+  const handlePlay = () => {
     if(!oscStartedRef.current) { 
       oscStartedRef.current = true;
       oscRef.current.start(); 
     }
-
-    if(!isPlaying) { 
-      gainRef.current.gain.setTargetAtTime(0.5, nowRef.current, 0.1);
+   
+    if(isPlaying === false) { 
+      gainRef.current.gain.setTargetAtTime(0.5, audioContextRef.current.currentTime, 0.1);
     } else {
-      gainRef.current.gain.setTargetAtTime(0.0, nowRef.current, 0.1);
+      gainRef.current.gain.setTargetAtTime(0.0, audioContextRef.current.currentTime, 0.1);
     }
-
     setIsPlaying(!isPlaying);
+  }
+
+  const handleShort = () => {
+    if(!oscStartedRef.current) { 
+      oscStartedRef.current = true;
+      oscRef.current.start(); 
+    }
+    gainRef.current.gain.setValueAtTime(gainRef.current.gain.value, audioContextRef.current.currentTime);
+    gainRef.current.gain.linearRampToValueAtTime(0.5, audioContextRef.current.currentTime + 0.001);
+    gainRef.current.gain.linearRampToValueAtTime(0.0, audioContextRef.current.currentTime + 0.05);
+    
   }
 
   const handleFreqChange = (event) => {
@@ -58,14 +69,17 @@ export default function App() {
     setWaveshape(event.target.value);
   }
 
+  
+
   return (
     <>
       <h1>Web Audio API + React</h1>
       <div className="card">
-        <button onClick={handleClick}>
+        <button onClick={handlePlay}>
           {`${isPlaying ? "Stop"  :  "Play" }`}
         </button>
-        <div>
+        <button style={{marginLeft: '10px'}} onClick={handleShort}>Short</button>
+        <div style={{marginTop: '10px', 'border': 'solid 1px #666'}}>
           <input type="radio" value="sine" name="waveshape" id="sine" checked={waveshape === "sine"} onChange={handleShapeChange}></input>
           <label>sine</label>
           <input type="radio" value="triangle" name="waveshape" id="triangle" checked={waveshape === "triangle"} onChange={handleShapeChange}></input>
