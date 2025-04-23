@@ -10,7 +10,7 @@ export default function App() {
   const oscStartedRef = useRef(false);
   const [freq, setFreq] = useState(440);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [waveshape, setWaveshape] = useState("sine");
+  const [waveshape, setWaveshape] = useState("square");
 
   useEffect(()=> {
     audioContextRef.current = new AudioContext();
