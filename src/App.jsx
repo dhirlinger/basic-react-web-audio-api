@@ -9,11 +9,11 @@ export default function App() {
   const gainRef = useRef(null);
   const nowRef = useRef(null);
   const oscStartedRef = useRef(false);
-  const seqArrayRef = useRef([]);
+  
   const [freq, setFreq] = useState(440);
   const [isPlaying, setIsPlaying] = useState(false);
   const [waveshape, setWaveshape] = useState("square");
-  const [seqIsPlaying, setSeqIsPlaying] = useState(false);
+ 
 
   useEffect(()=> {
     audioContextRef.current = new AudioContext();
@@ -72,40 +72,6 @@ export default function App() {
     setWaveshape(event.target.value);
   }
 
-  const handleSeqPlay = () => {
-    if(!oscStartedRef.current) { 
-      oscStartedRef.current = true;
-      oscRef.current.start(); 
-    }
-
-    //setSeqIsPlaying(!seqIsPlaying);
-    if (!seqIsPlaying) {
-      const interval = 80; 
-      setSeqIsPlaying(true);
-  
-      seqArrayRef.current.forEach((val, i) => {
-        setTimeout(() => {
-          const p = val === 0 ? 0 : 110 * val;
-          oscRef.current.frequency.value = p;
-          if (p > 0) {
-            handleShort();
-          }
-          console.log(`Played note ${p}`);
-          if (i === seqArrayRef.current.length - 1) {
-            setSeqIsPlaying(false);
-          }
-        }, i * interval);
-      });
-    } else {
-      oscRef.current.frequency.value = freq;
-      gainRef.current.gain.cancelScheduledValues(audioContextRef.current.currentTime);
-      setSeqIsPlaying(false);
-    }
-  };
-  
-
-  
-
   return (
     <>
       <h1>Web Audio API + React</h1>
@@ -128,21 +94,7 @@ export default function App() {
           <h2>Frequency: {freq}</h2>
           <input max="880" min="110" type="range" value={freq} step="110" onChange={handleFreqChange}/>
         </div>
-        <div style={{border: 'solid 1px #666', padding: '0 10px 10px', marginTop: "20px"}}>
-          <h2 style={{marginBottom: "0", marginTop: "0"}}>Sequencer:</h2>
-          <p style={{marginTop: "0"}}>There are 8 frequency values accessable from the frequency slider. Sequence up to 8 positions on the slider (1-8). Enter 0 for a rest in the sequence. Empty boxes will result in a shorter sequence.</p>
-            <NumberInput arrIndex={0} array={seqArrayRef}/>
-            <NumberInput arrIndex={1} array={seqArrayRef}/>
-            <NumberInput arrIndex={2} array={seqArrayRef}/>
-            <NumberInput arrIndex={3} array={seqArrayRef}/>
-            <NumberInput arrIndex={4} array={seqArrayRef}/>
-            <NumberInput arrIndex={5} array={seqArrayRef}/>
-            <NumberInput arrIndex={6} array={seqArrayRef}/>
-            <NumberInput arrIndex={7} array={seqArrayRef}/>
-            <div style={{marginTop: '10px'}}>
-              <button onClick={handleSeqPlay}>{seqIsPlaying ? 'Stop' : 'Play Seq'}</button>
-              </div>
-        </div>
+        
       </div>
       
       
