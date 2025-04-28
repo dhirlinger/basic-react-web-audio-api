@@ -1,14 +1,30 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Seq1Voice from "../Seq1Voice";
 import NumberInput from "./NumberInput";
 
-export default function Sequencer1({ seqIsPlaying, setSeqIsPlaying }) {
+export default function Sequencer1({
+  seqIsPlaying,
+  setSeqIsPlaying,
+  waveshape,
+  onIndexChange,
+}) {
   const seqArrayRef = useRef([]);
   const seq1Instance = useRef(null);
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    seq1Instance.current = new Seq1Voice(500);
+    seq1Instance.current = new Seq1Voice(600);
+    seq1Instance.current.onBeatCallback = (beatNumber) => {
+      setIndex(beatNumber);
+      if (onIndexChange) {
+        onIndexChange(beatNumber);
+      }
+    };
   }, []);
+
+  useEffect(() => {
+    seq1Instance.current.shape = waveshape;
+  }, [waveshape]);
 
   const handleClick = () => {
     setSeqIsPlaying(!seqIsPlaying);
