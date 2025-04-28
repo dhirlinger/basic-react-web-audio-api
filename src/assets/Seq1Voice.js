@@ -1,5 +1,5 @@
 export default class Seq1Voice {
-  constructor(tempo = 300) {
+  constructor(tempo = 600) {
     this.audioContext = null;
     this.notesInQueue = []; // notes that have been put into the web audio and may or may not have been played yet {note, time}
     this.currentQuarterNote = 0;
@@ -14,6 +14,7 @@ export default class Seq1Voice {
     this.array = [];
     this.shape = "square";
     this.onBeatCallback = null;
+    this.noteLength = 0.05;
   }
 
   nextNote() {
@@ -24,10 +25,6 @@ export default class Seq1Voice {
     this.currentQuarterNote++; // Advance the beat number, wrap to zero
     if (this.currentQuarterNote == this.beatsPerBar) {
       this.currentQuarterNote = 0;
-    }
-
-    if (this.onBeatCallback) {
-      this.onBeatCallback(this.currentQuarterNote);
     }
   }
 
@@ -43,16 +40,19 @@ export default class Seq1Voice {
     !this.array[beatNumber]
       ? (this.array[beatNumber] = 0)
       : this.array[beatNumber];
-    osc.frequency.value = this.array[beatNumber] * 100;
+    osc.frequency.value = this.array[beatNumber] * 110;
     osc.type = this.shape;
+    if (this.onBeatCallback) {
+      this.onBeatCallback(this.array[beatNumber]);
+    }
 
     env.gain.value = 0.5;
     env.gain.exponentialRampToValueAtTime(0.5, time + 0.001);
-    env.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+    env.gain.exponentialRampToValueAtTime(0.001, time + this.noteLength);
 
     osc.connect(env).connect(this.audioContext.destination);
     osc.start(time);
-    osc.stop(time + 0.05);
+    osc.stop(time + this.noteLength);
   }
 
   scheduler() {
