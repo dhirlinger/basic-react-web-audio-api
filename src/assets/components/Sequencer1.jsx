@@ -1,13 +1,19 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Seq1Voice from "../Seq1Voice";
+import NumberInput from "./NumberInput";
 
 export default function Sequencer1() {
   const seqArrayRef = useRef([]);
   const [seqIsPlaying, setSeqIsPlaying] = useState(false);
-  const Seq1Instance = useRef(null);
+  const seq1Instance = useRef(null);
+
+  useEffect(() => {
+    seq1Instance.current = new Seq1Voice(400);
+  }, []);
 
   const handleClick = () => {
     setSeqIsPlaying(!seqIsPlaying);
+    seq1Instance.current.startStop(seqArrayRef.current);
   };
 
   return (

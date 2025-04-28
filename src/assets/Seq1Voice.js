@@ -1,5 +1,5 @@
 export default class Seq1Voice {
-  constructor(tempo = 300, array) {
+  constructor(tempo = 300) {
     this.audioContext = null;
     this.notesInQueue = []; // notes that have been put into the web audio and may or may not have been played yet {note, time}
     this.currentQuarterNote = 0;
@@ -11,7 +11,7 @@ export default class Seq1Voice {
     this.intervalID = null;
     this.beatsPerBar = 8;
     this.freq = 440;
-    this.array = array;
+    this.array = [];
   }
 
   nextNote() {
@@ -79,12 +79,15 @@ export default class Seq1Voice {
     clearInterval(this.intervalID);
 
     this.reset();
+    console.log("end of stop");
   }
 
-  startStop() {
+  startStop(array) {
+    console.log(this.isRunning);
     if (this.isRunning) {
       this.stop();
     } else {
+      this.array = array;
       this.start();
     }
   }
