@@ -12,6 +12,8 @@ export default class Seq1Voice {
     this.beatsPerBar = 8;
     this.freq = 440;
     this.array = [];
+    this.shape = "square";
+    this.onBeatCallback = null;
   }
 
   nextNote() {
@@ -22,6 +24,10 @@ export default class Seq1Voice {
     this.currentQuarterNote++; // Advance the beat number, wrap to zero
     if (this.currentQuarterNote == this.beatsPerBar) {
       this.currentQuarterNote = 0;
+    }
+
+    if (this.onBeatCallback) {
+      this.onBeatCallback(this.currentQuarterNote);
     }
   }
 
@@ -34,12 +40,15 @@ export default class Seq1Voice {
     const env = this.audioContext.createGain();
 
     this.beatsPerBar = this.array.length;
-
+    !this.array[beatNumber]
+      ? (this.array[beatNumber] = 0)
+      : this.array[beatNumber];
     osc.frequency.value = this.array[beatNumber] * 100;
+    osc.type = this.shape;
 
     env.gain.value = 0.5;
     env.gain.exponentialRampToValueAtTime(0.5, time + 0.001);
-    env.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+    env.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
 
     osc.connect(env).connect(this.audioContext.destination);
     osc.start(time);
@@ -77,13 +86,9 @@ export default class Seq1Voice {
     this.isRunning = false;
 
     clearInterval(this.intervalID);
-
-    this.reset();
-    console.log("end of stop");
   }
 
   startStop(array) {
-    console.log(this.isRunning);
     if (this.isRunning) {
       this.stop();
     } else {

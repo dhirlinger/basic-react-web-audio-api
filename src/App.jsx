@@ -12,6 +12,8 @@ export default function App() {
   const [freq, setFreq] = useState(440);
   const [isPlaying, setIsPlaying] = useState(false);
   const [waveshape, setWaveshape] = useState("square");
+  const [seqIsPlaying, setSeqIsPlaying] = useState(false);
+  const [seqIndex, setSeqIndex] = useState(0);
 
   useEffect(() => {
     audioContextRef.current = new AudioContext();
@@ -92,8 +94,14 @@ export default function App() {
     <>
       <h1>Web Audio API + React</h1>
       <div className="card">
-        <button onClick={handlePlay}>{`${isPlaying ? "Stop" : "Play"}`}</button>
-        <button style={{ marginLeft: "10px" }} onClick={handleShort}>
+        <button disabled={seqIsPlaying} onClick={handlePlay}>{`${
+          isPlaying ? "Stop" : "Play"
+        }`}</button>
+        <button
+          disabled={seqIsPlaying}
+          style={{ marginLeft: "10px" }}
+          onClick={handleShort}
+        >
           Short
         </button>
         <div style={{ marginTop: "20px", border: "solid 1px #666" }}>
@@ -135,17 +143,25 @@ export default function App() {
           <label htmlFor="sawtooth">sawtooth</label>
         </div>
         <div>
-          <h2>Frequency: {freq}</h2>
+          <h2>Frequency: {seqIsPlaying ? seqIndex * 110 : freq}</h2>
           <input
             max="880"
             min="110"
             type="range"
-            value={freq}
+            value={seqIsPlaying ? seqIndex * 110 : freq}
             step="110"
             onChange={handleFreqChange}
+            disabled={seqIsPlaying}
           />
         </div>
-        <Sequencer1 />
+        <Sequencer1
+          seqIsPlaying={seqIsPlaying}
+          setSeqIsPlaying={setSeqIsPlaying}
+          waveshape={waveshape}
+          onIndexChange={(i) => {
+            setSeqIndex(i);
+          }}
+        />
       </div>
     </>
   );
