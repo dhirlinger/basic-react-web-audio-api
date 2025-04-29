@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import Seq1Voice from "../Seq1Voice";
 import Seq1ArrInput from "./Seq1ArrInput";
+import LowPassFilter from "./LowPassFilter";
 
 export default function Sequencer1({
   seqIsPlaying,
@@ -12,6 +13,8 @@ export default function Sequencer1({
   const seq1Instance = useRef(null);
   const [seq1Tempo, setSeq1Tempo] = useState("600");
   const [duration, setDuration] = useState("0.05");
+  const [lowPassFreq, setLowPassFreq] = useState("15000");
+  const [lowPassQ, setLowPassQ] = useState("0");
 
   useEffect(() => {
     seq1Instance.current = new Seq1Voice(600);
@@ -39,6 +42,14 @@ export default function Sequencer1({
   useEffect(() => {
     seq1Instance.current.shape = waveshape;
   }, [waveshape]);
+
+  useEffect(() => {
+    seq1Instance.current.lowPassFreq = lowPassFreq;
+  }, [lowPassFreq]);
+
+  useEffect(() => {
+    seq1Instance.current.qValue = lowPassQ;
+  }, [lowPassQ]);
 
   const handleClick = () => {
     setSeqIsPlaying(!seqIsPlaying);
@@ -94,6 +105,15 @@ export default function Sequencer1({
           <button onClick={handleClick}>
             {seqIsPlaying ? "Stop" : "Play Seq"}
           </button>
+        </div>
+        <div style={{ border: "solid 1px white", marginTop: "5px" }}>
+          <h3 style={{ marginBottom: "5px" }}>Low Pass Filter</h3>
+          <LowPassFilter
+            value={lowPassFreq}
+            setValue={setLowPassFreq}
+            qValue={lowPassQ}
+            setQValue={setLowPassQ}
+          />
         </div>
       </div>
     </>
