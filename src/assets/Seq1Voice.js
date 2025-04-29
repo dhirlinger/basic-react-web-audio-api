@@ -15,6 +15,8 @@ export default class Seq1Voice {
     this.shape = "square";
     this.onBeatCallback = null;
     this.noteLength = 0.05;
+    this.lowPassFreq = 15000;
+    this.qValue = 0;
   }
 
   nextNote() {
@@ -32,8 +34,9 @@ export default class Seq1Voice {
     // push the note on the queue, even if we're not playing.
     this.notesInQueue.push({ note: beatNumber, time: time });
 
-    // create oscillator + gain node
+    // create oscillator + gain node + low pass filter
     const osc = this.audioContext.createOscillator();
+    const lowpass = this.audioContext.createBiquadFilter();
     const env = this.audioContext.createGain();
 
     this.beatsPerBar = this.array.length;
@@ -46,11 +49,17 @@ export default class Seq1Voice {
       this.onBeatCallback(this.array[beatNumber]);
     }
 
+    // Manipulate the Biquad filter
+
+    lowpass.type = "lowpass";
+    lowpass.frequency.setValueAtTime(this.lowPassFreq, time);
+    lowpass.Q.value = this.qValue;
+
     env.gain.value = 0.5;
     env.gain.exponentialRampToValueAtTime(0.5, time + 0.001);
     env.gain.exponentialRampToValueAtTime(0.001, time + this.noteLength);
 
-    osc.connect(env).connect(this.audioContext.destination);
+    osc.connect(lowpass).connect(env).connect(this.audioContext.destination);
     osc.start(time);
     osc.stop(time + this.noteLength);
   }
