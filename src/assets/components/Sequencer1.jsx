@@ -27,7 +27,7 @@ export default function Sequencer1({
   }, [onIndexChange]);
 
   useEffect(() => {
-    if (seq1Tempo > 100 && seq1Tempo < 1000) {
+    if (seq1Tempo > 99 && seq1Tempo < 1001) {
       seq1Instance.current.tempo = seq1Tempo;
     }
   }, [seq1Tempo]);
@@ -88,7 +88,7 @@ export default function Sequencer1({
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
           />
-          <span style={{ width: "50px" }}>{duration}</span>
+          <span style={{ width: "50px" }}>{Number(duration).toFixed(2)}</span>
         </div>
         <div style={{ marginTop: "10px" }}>
           <button onClick={handleClick}>
